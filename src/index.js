@@ -1,3 +1,3 @@
-import MergeLink from './MergeLink.vue'
+import MergeLink from "./MergeLink.vue";
 
-module.exports = MergeLink
+module.exports = MergeLink;
