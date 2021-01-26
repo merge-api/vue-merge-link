@@ -1,0 +1,37 @@
+{
+  "name": "@mergeapi/vue-merge-link",
+  "version": "1.0.0",
+  "description": "Vue wrapper for Merge linking flow. ",
+  "main": "dist/index.umd.js",
+  "module": "dist/index.esm.js",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "test": "jest",
+    "build": "rollup -c"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/merge-api/vue-merge-link.git"
+  },
+  "keywords": [
+    "merge"
+  ],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/merge-api/vue-merge-link/issues"
+  },
+  "homepage": "https://github.com/merge-api/vue-merge-link#readme",
+  "dependencies": {
+    "@babel/core": "^7.12.10",
+    "@babel/plugin-syntax-jsx": "^7.12.1",
+    "@rollup/plugin-babel": "^5.2.2",
+    "@rollup/plugin-node-resolve": "^11.1.0",
+    "@vue/compiler-sfc": "^3.0.5",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-vue": "^6.0.0"
+  }
+}
