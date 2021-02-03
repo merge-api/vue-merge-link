@@ -1,3 +1,4 @@
 # vue-merge-link
 
-Vue wrapper for Merge link
+See documentation at https://app.merge.dev/documentation/basics/linking-flow.
+
