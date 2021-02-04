@@ -1,6 +1,6 @@
 <script>
 import Vue from 'vue';
-import MergeLink from '@/merge-link.vue';
+import MergeLink from '../src/merge-link.vue';
 
 export default Vue.extend({
   name: 'ServeDev',
