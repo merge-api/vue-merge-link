@@ -1,4 +1,3 @@
 # vue-merge-link
 
-See documentation at https://app.merge.dev/documentation/basics/linking-flow.
-
+See documentation at https://merge.dev/docs/linking-flow/get-started.
