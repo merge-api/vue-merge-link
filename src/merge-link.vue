@@ -13,6 +13,7 @@ export default {
   name: "MergeLink",
   props: {
     linkToken: String,
+    shouldSendTokenOnSuccessfulLink: Boolean,
     onReady: Function,
     onSuccess: Function,
     onExit: Function,
@@ -29,6 +30,7 @@ export default {
     onScriptLoaded() {
       window.MergeLink.initialize({
         linkToken: this.linkToken,
+        shouldSendTokenOnSuccessfulLink: this.shouldSendTokenOnSuccessfulLink,
         onExit: this.onExit,
         onReady: this.onReady,
         onSuccess: this.onSuccess,
