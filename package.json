@@ -1,6 +1,6 @@
 {
   "name": "@mergeapi/vue-merge-link",
-  "version": "1.0.9",
+  "version": "1.1.0",
   "description": "",
   "main": "dist/merge-link.ssr.js",
   "browser": "dist/merge-link.esm.js",

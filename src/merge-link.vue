@@ -17,6 +17,7 @@ export default {
     onReady: Function,
     onSuccess: Function,
     onExit: Function,
+    tenantConfig: Object,
   },
   created() {
     this.loadScript("https://cdn.merge.dev/initialize.js")
@@ -30,6 +31,7 @@ export default {
     onScriptLoaded() {
       window.MergeLink.initialize({
         linkToken: this.linkToken,
+        tenantConfig: this.tenantConfig,
         shouldSendTokenOnSuccessfulLink: this.shouldSendTokenOnSuccessfulLink,
         onExit: this.onExit,
         onReady: this.onReady,
