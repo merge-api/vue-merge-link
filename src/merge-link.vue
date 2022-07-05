@@ -13,7 +13,11 @@ export default {
   name: "MergeLink",
   props: {
     linkToken: String,
-    shouldSendTokenOnSuccessfulLink: Boolean,
+    /**
+     * Make Link call `onSuccess` immediately after an account has been successfully linked instead of after the user closes the Link modal.
+     * Defaults to `true` as of v3.0.0. The default is `false` in prior versions.
+     */
+    shouldSendTokenOnSuccessfulLink: { type: Boolean, default: true },
     onReady: Function,
     onSuccess: Function,
     onExit: Function,
