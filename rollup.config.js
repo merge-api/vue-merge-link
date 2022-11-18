@@ -21,7 +21,7 @@ const argv = minimist(process.argv.slice(2));
 const projectRoot = path.resolve(__dirname, '..');
 
 const baseConfig = {
-  input: 'src/entry.js',
+  input: 'src/entry.esm.js',
   plugins: {
     preVue: [
       alias({
@@ -76,7 +76,6 @@ const buildFormats = [];
 if (!argv.format || argv.format === 'es') {
   const esConfig = {
     ...baseConfig,
-    input: 'src/entry.esm.js',
     external,
     output: {
       file: 'dist/merge-link.esm.js',

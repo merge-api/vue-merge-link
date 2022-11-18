@@ -1,67 +1,95 @@
-'use strict';var component=require('entry.esm');function _interopDefaultLegacy(e){return e&&typeof e==='object'&&'default'in e?e:{'default':e}}function _interopNamespace(e){if(e&&e.__esModule)return e;var n=Object.create(null);if(e){Object.keys(e).forEach(function(k){if(k!=='default'){var d=Object.getOwnPropertyDescriptor(e,k);Object.defineProperty(n,k,d.get?d:{enumerable:true,get:function(){return e[k]}});}})}n["default"]=e;return Object.freeze(n)}var component__namespace=/*#__PURE__*/_interopNamespace(component);var component__default=/*#__PURE__*/_interopDefaultLegacy(component);function _slicedToArray(arr, i) {
-  return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest();
-}
+'use strict';var vue=require('vue');var script = {
+  name: "MergeLink",
+  props: {
+    linkToken: String,
 
-function _arrayWithHoles(arr) {
-  if (Array.isArray(arr)) return arr;
-}
+    /**
+     * Make Link call `onSuccess` immediately after an account has been successfully linked instead of after the user closes the Link modal.
+     * Defaults to `true` as of v3.0.0. The default is `false` in prior versions.
+     */
+    shouldSendTokenOnSuccessfulLink: {
+      type: Boolean,
+      default: true
+    },
+    onReady: Function,
+    onSuccess: Function,
+    onExit: Function,
+    tenantConfig: Object
+  },
+  created: function created() {
+    this.loadScript("https://cdn.merge.dev/initialize.js").then(this.onScriptLoaded).catch(this.onScriptError);
+  },
+  methods: {
+    onScriptError: function onScriptError() {
+      console.error("There was an issue loading the link-initialize.js script");
+    },
+    onScriptLoaded: function onScriptLoaded() {
+      window.MergeLink.initialize({
+        linkToken: this.linkToken,
+        tenantConfig: this.tenantConfig,
+        shouldSendTokenOnSuccessfulLink: this.shouldSendTokenOnSuccessfulLink,
+        onExit: this.onExit,
+        onReady: this.onReady,
+        onSuccess: this.onSuccess
+      });
+    },
+    handleOnClick: function handleOnClick() {
+      window.MergeLink.openLink();
+    },
+    loadScript: function loadScript(src) {
+      return new Promise(function (resolve, reject) {
+        if (document.querySelector('script[src="' + src + '"]')) {
+          resolve();
+          return;
+        }
 
-function _iterableToArrayLimit(arr, i) {
-  var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"];
-
-  if (_i == null) return;
-  var _arr = [];
-  var _n = true;
-  var _d = false;
-
-  var _s, _e;
-
-  try {
-    for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) {
-      _arr.push(_s.value);
-
-      if (i && _arr.length === i) break;
+        var el = document.createElement("script");
+        el.type = "text/javascript";
+        el.async = true;
+        el.src = src;
+        el.addEventListener("load", resolve);
+        el.addEventListener("error", reject);
+        el.addEventListener("abort", reject);
+        document.head.appendChild(el);
+      });
     }
-  } catch (err) {
-    _d = true;
-    _e = err;
-  } finally {
-    try {
-      if (!_n && _i["return"] != null) _i["return"]();
-    } finally {
-      if (_d) throw _e;
+  },
+  watch: {
+    $data: {
+      handler: function handler() {
+        this.onScriptLoaded();
+      },
+      deep: true
     }
   }
+};var _hoisted_1 = {
+  class: "merge-link-wrapper"
+};
+function render(_ctx, _cache, $props, $setup, $data, $options) {
+  return vue.openBlock(), vue.createElementBlock("div", _hoisted_1, [vue.renderSlot(_ctx.$slots, "button", {
+    onClick: $options.handleOnClick
+  }, function () {
+    return [vue.createElementVNode("button", {
+      class: "merge-link-button",
+      onClick: _cache[0] || (_cache[0] = function () {
+        return $options.handleOnClick && $options.handleOnClick.apply($options, arguments);
+      })
+    }, [vue.renderSlot(_ctx.$slots, "default")])];
+  })]);
+}script.render = render;// Import vue component
+// IIFE injects install function into component, allowing component
+// to be registered via Vue.use() as well as Vue.component(),
 
-  return _arr;
-}
+var entry_esm = /*#__PURE__*/(function () {
+  // Get component instance
+  var installable = script; // Attach install function executed by Vue.use()
 
-function _unsupportedIterableToArray(o, minLen) {
-  if (!o) return;
-  if (typeof o === "string") return _arrayLikeToArray(o, minLen);
-  var n = Object.prototype.toString.call(o).slice(8, -1);
-  if (n === "Object" && o.constructor) n = o.constructor.name;
-  if (n === "Map" || n === "Set") return Array.from(o);
-  if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
-}
+  installable.install = function (Vue) {
+    Vue.component('MergeLink', installable);
+  };
 
-function _arrayLikeToArray(arr, len) {
-  if (len == null || len > arr.length) len = arr.length;
-
-  for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
-
-  return arr2;
-}
-
-function _nonIterableRest() {
-  throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
-}// only expose one global var, with named exports exposed as properties of
-// that global var (eg. plugin.namedExport)
-
-Object.entries(component__namespace).forEach(function (_ref) {
-  var _ref2 = _slicedToArray(_ref, 2),
-      exportName = _ref2[0],
-      exported = _ref2[1];
-
-  if (exportName !== 'default') component__default["default"][exportName] = exported;
-});module.exports=component__default["default"];
+  return installable;
+})(); // It's possible to expose named exports when writing components that can
+// also be used as directives, etc. - eg. import { RollupDemoDirective } from 'rollup-demo';
+// export const RollupDemoDirective = directive;
+module.exports=entry_esm;
