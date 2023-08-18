@@ -22,6 +22,28 @@ export default {
     onSuccess: Function,
     onExit: Function,
     tenantConfig: Object,
+    onValidationError: Function,
+    filePickerConfig: {
+      type: Object,
+      required: false,
+      validator: function (filePickerConfigValue) {
+        // onSubmit is required
+        const hasOnSubmit =
+          "onSubmit" in filePickerConfigValue &&
+          typeof filePickerConfigValue.onSubmit === "function";
+        // types is optional
+        const hasTypes =
+          "types" in value
+            ? typeof filePickerConfigValue.types === "object"
+            : true; // arrays come back as objects
+        // allowMultiSelect is optional
+        const hasAllowMultiSelect =
+          "allowMultiSelect" in filePickerConfigValue
+            ? typeof filePickerConfigValue.allowMultiSelect === "boolean"
+            : true;
+        return hasOnSubmit && hasTypes && hasAllowMultiSelect;
+      },
+    },
   },
   created() {
     this.loadScript("https://cdn.merge.dev/initialize.js")
@@ -40,6 +62,8 @@ export default {
         onExit: this.onExit,
         onReady: this.onReady,
         onSuccess: this.onSuccess,
+        onValidationError: this.onValidationError,
+        filePickerConfig: this.filePickerConfig,
       });
     },
     handleOnClick() {
