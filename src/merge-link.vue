@@ -23,26 +23,11 @@ export default {
     onExit: Function,
     tenantConfig: Object,
     onValidationError: Function,
+    // all props are optional by default
     filePickerConfig: {
-      type: Object,
-      required: false,
-      validator: function (filePickerConfigValue) {
-        // onSubmit is required
-        const hasOnSubmit =
-          "onSubmit" in filePickerConfigValue &&
-          typeof filePickerConfigValue.onSubmit === "function";
-        // types is optional
-        const hasTypes =
-          "types" in value
-            ? typeof filePickerConfigValue.types === "object"
-            : true; // arrays come back as objects
-        // allowMultiSelect is optional
-        const hasAllowMultiSelect =
-          "allowMultiSelect" in filePickerConfigValue
-            ? typeof filePickerConfigValue.allowMultiSelect === "boolean"
-            : true;
-        return hasOnSubmit && hasTypes && hasAllowMultiSelect;
-      },
+      onSubmit: Function,
+      types: Object, // Arrays are treated as objects
+      allowMultiSelect: Boolean,
     },
   },
   created() {
