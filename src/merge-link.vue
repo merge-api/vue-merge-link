@@ -22,6 +22,13 @@ export default {
     onSuccess: Function,
     onExit: Function,
     tenantConfig: Object,
+    onValidationError: Function,
+    // all props are optional by default
+    filePickerConfig: {
+      onSubmit: Function,
+      types: Object, // Arrays are treated as objects
+      allowMultiSelect: Boolean,
+    },
   },
   created() {
     this.loadScript("https://cdn.merge.dev/initialize.js")
@@ -40,6 +47,8 @@ export default {
         onExit: this.onExit,
         onReady: this.onReady,
         onSuccess: this.onSuccess,
+        onValidationError: this.onValidationError,
+        filePickerConfig: this.filePickerConfig,
       });
     },
     handleOnClick() {
