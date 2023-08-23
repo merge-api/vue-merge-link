@@ -1,4 +1,12 @@
-'use strict';var vue=require('vue');var script = {
+'use strict';var vue=require('vue');function _typeof(obj) {
+  "@babel/helpers - typeof";
+
+  return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) {
+    return typeof obj;
+  } : function (obj) {
+    return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+  }, _typeof(obj);
+}var script = {
   name: "MergeLink",
   props: {
     linkToken: String,
@@ -17,7 +25,20 @@
     tenantConfig: Object,
     onValidationError: Function,
     // all props are optional by default
-    filePickerConfig: Object
+    filePickerConfig: {
+      type: Object,
+      required: false,
+      validator: function validator(filePickerConfigValue) {
+        // onSubmit is required
+        var hasOnSubmit = "onSubmit" in filePickerConfigValue && typeof filePickerConfigValue.onSubmit === "function"; // types is optional
+
+        var hasTypes = "types" in value ? _typeof(filePickerConfigValue.types) === "object" : true; // arrays come back as objects
+        // allowMultiSelect is optional
+
+        var hasAllowMultiSelect = "allowMultiSelect" in filePickerConfigValue ? typeof filePickerConfigValue.allowMultiSelect === "boolean" : true;
+        return hasOnSubmit && hasTypes && hasAllowMultiSelect;
+      }
+    }
   },
   created: function created() {
     this.loadScript("https://cdn.merge.dev/initialize.js").then(this.onScriptLoaded).catch(this.onScriptError);

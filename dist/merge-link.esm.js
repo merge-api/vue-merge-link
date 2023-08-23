@@ -19,7 +19,20 @@ var script = {
     tenantConfig: Object,
     onValidationError: Function,
     // all props are optional by default
-    filePickerConfig: Object
+    filePickerConfig: {
+      type: Object,
+      required: false,
+      validator: function (filePickerConfigValue) {
+        // onSubmit is required
+        const hasOnSubmit = "onSubmit" in filePickerConfigValue && typeof filePickerConfigValue.onSubmit === "function"; // types is optional
+
+        const hasTypes = "types" in value ? typeof filePickerConfigValue.types === "object" : true; // arrays come back as objects
+        // allowMultiSelect is optional
+
+        const hasAllowMultiSelect = "allowMultiSelect" in filePickerConfigValue ? typeof filePickerConfigValue.allowMultiSelect === "boolean" : true;
+        return hasOnSubmit && hasTypes && hasAllowMultiSelect;
+      }
+    }
   },
 
   created() {
