@@ -19,12 +19,7 @@ var script = {
     tenantConfig: Object,
     onValidationError: Function,
     // all props are optional by default
-    filePickerConfig: {
-      onSubmit: Function,
-      types: Object,
-      // Arrays are treated as objects
-      allowMultiSelect: Boolean
-    }
+    filePickerConfig: Object
   },
 
   created() {
