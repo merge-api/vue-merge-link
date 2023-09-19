@@ -9,8 +9,6 @@ When updating this repo, bump the version number in `package.json` according to 
 ### Frequently Asked Questions (FAQ)
 
 #### **Q: What version of Vue do you support?**
-**A:** The latest version of this package requires Vue version 3.0+. If you need support for an older version of Vue, you can use an older version of this package (1.1). Note that these packages are not supported and older versions of Vue have been [deprecated](https://vuejs.org/about/faq.html#is-vue-2-still-supported).
-
 **A:** This package is designed for Vue 3.0 and newer versions. If you're working with an older version of Vue, specifically Vue 2, you can use version 1.1 of this package. However, please be aware that the older versions of the package aren't actively supported. Also, Vue 2 itself is [reaching end of life](https://vuejs.org/about/faq.html#is-vue-2-still-supported).
 
 #### **Q: What domains are necessary to whitelist for Content Security Policies (CSP)?**
