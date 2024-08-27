@@ -9,8 +9,7 @@ export const useMergeLink = (config?: MaybeRefOrGetter<UseMergeLinkProps>) => {
 
   onMounted(async () => {
     _promise = loadScript()
-    await _promise
-    initialize()
+    await initialize()
   })
 
   const loadScript = () => {
