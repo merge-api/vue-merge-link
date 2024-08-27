@@ -34,7 +34,7 @@ export type FilePickerConfig = {
 };
 
 export interface TenantConfig {
-  apiBaseURL?: 'https://api.merge.dev' | 'https://api-ap.merge.dev' | 'https://api-eu.merge.dev' | string;
+  apiBaseURL?: 'https://api.merge.dev' | 'https://api-ap.merge.dev' | 'https://api-eu.merge.dev' | (string & {});
 }
 export interface UseMergeLinkProps {
   linkToken?: string;
