@@ -38,7 +38,8 @@
         var hasAllowMultiSelect = "allowMultiSelect" in filePickerConfigValue ? typeof filePickerConfigValue.allowMultiSelect === "boolean" : true;
         return hasOnSubmit && hasTypes && hasAllowMultiSelect;
       }
-    }
+    },
+    parentContainerID: String
   },
   created: function created() {
     this.loadScript("https://cdn.merge.dev/initialize.js").then(this.onScriptLoaded).catch(this.onScriptError);

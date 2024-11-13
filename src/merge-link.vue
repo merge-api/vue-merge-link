@@ -45,6 +45,7 @@ export default {
         return hasOnSubmit && hasTypes && hasAllowMultiSelect;
       },
     },
+    parentContainerID: String,
   },
   created() {
     this.loadScript("https://cdn.merge.dev/initialize.js")

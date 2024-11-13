@@ -32,7 +32,8 @@ var script = {
         const hasAllowMultiSelect = "allowMultiSelect" in filePickerConfigValue ? typeof filePickerConfigValue.allowMultiSelect === "boolean" : true;
         return hasOnSubmit && hasTypes && hasAllowMultiSelect;
       }
-    }
+    },
+    parentContainerID: String
   },
 
   created() {
