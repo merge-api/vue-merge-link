@@ -2,7 +2,7 @@
 
 See documentation at https://merge.dev/docs/linking-flow/get-started.
 
-When updating this repo, bump the version number in `package.json` according to this semantic versioning scheme: https://docs.npmjs.com/about-semantic-versioning, also when updating merge-link.vue run 'yarn build' afterward to generate the .esm/.ssr files
+When updating this repo, bump the version number in `package.json` according to this semantic versioning scheme: https://docs.npmjs.com/about-semantic-versioning. To release, push a tag for the new version (e.g. `git tag v3.2.0 && git push origin v3.2.0`); CI builds `dist/` and publishes to npm. Tags containing `alpha` or `beta` publish under that npm dist-tag.
 
 ---
 
