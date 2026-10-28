@@ -12,6 +12,14 @@ When updating this repo, bump the version number in `package.json` according to 
 
 **A:** This package is designed for Vue 3.0 and newer versions. If you're working with an older version of Vue, specifically Vue 2, you can use version 1.1 of this package. However, please be aware that the older versions of the package aren't actively supported. Also, Vue 2 itself is [reaching end of life](https://vuejs.org/about/faq.html#is-vue-2-still-supported).
 
+#### **Q: Does this package support TypeScript?**
+
+**A:** Yes, as of 3.2.0. Type definitions ship with the package (`types/index.d.ts`), including `MergeLinkProps`, `FilePickerConfig`, and `TenantConfig`.
+
+#### **Q: Can I change `linkToken` (or other props) without remounting the component?**
+
+**A:** Yes, as of 3.2.0. Changing `linkToken`, `tenantConfig`, `filePickerConfig`, `parentContainerID`, or `shouldSendTokenOnSuccessfulLink` re-initializes Link with the new values. Callback props (`onSuccess`, `onExit`, `onReady`, `onValidationError`) can be swapped at any time and don't re-initialize Link. On older versions, bind `:key="linkToken"` to force a remount.
+
 #### **Q: What domains are necessary to whitelist for Content Security Policies (CSP)?**
 
 **A:** You can see the domains required for whitelisting in this [help center](https://help.merge.dev/en/articles/5924787-using-content-security-policy-csp-with-merge) article.

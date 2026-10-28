@@ -1,5 +1,19 @@
 import { openBlock, createElementBlock, renderSlot, createElementVNode } from 'vue';
 
+const DEFAULT_CDN_URL = "https://cdn.merge.dev/initialize.js"; // Keep in sync with BASE_URL_TO_CDN_MAP in merge-api/react-merge-link src/useMergeLink.tsx.
+
+const BASE_URL_TO_CDN_MAP = {
+  "https://api.merge.dev": DEFAULT_CDN_URL,
+  "https://api-oai-usw2.openaimerge.com": "https://cdn.openaimerge.com/initialize.js",
+  "https://api-oai-euw1.openaimerge.com": "https://cdn.openaimerge.com/initialize.js",
+  "https://api-oai-apne3.openaimerge.com": "https://cdn.openaimerge.com/initialize.js",
+  "https://api-oai-apne2.openaimerge.com": "https://cdn.openaimerge.com/initialize.js",
+  "https://api-oai-apse2.openaimerge.com": "https://cdn.openaimerge.com/initialize.js",
+  "https://api-develop.merge.dev": "https://develop-cdn.merge.dev/initialize.js",
+  "https://api-mu-develop.merge.dev": "https://mu-develop-cdn.merge.dev/initialize.js",
+  "https://api-mu-staging.merge.dev": "https://mu-staging-cdn.merge.dev/initialize.js",
+  "https://api-usw2.dropboxmerge.com": "https://cdn.dropboxmerge.com/initialize.js"
+};
 var script = {
   name: "MergeLink",
   props: {
@@ -26,7 +40,7 @@ var script = {
         // onSubmit is required
         const hasOnSubmit = "onSubmit" in filePickerConfigValue && typeof filePickerConfigValue.onSubmit === "function"; // types is optional
 
-        const hasTypes = "types" in value ? typeof filePickerConfigValue.types === "object" : true; // arrays come back as objects
+        const hasTypes = "types" in filePickerConfigValue ? typeof filePickerConfigValue.types === "object" : true; // arrays come back as objects
         // allowMultiSelect is optional
 
         const hasAllowMultiSelect = "allowMultiSelect" in filePickerConfigValue ? typeof filePickerConfigValue.allowMultiSelect === "boolean" : true;
@@ -36,8 +50,38 @@ var script = {
     parentContainerID: String
   },
 
+  data() {
+    return {
+      isScriptLoaded: false
+    };
+  },
+
+  computed: {
+    scriptSrc() {
+      const apiBaseURL = this.tenantConfig && this.tenantConfig.apiBaseURL;
+      return apiBaseURL && BASE_URL_TO_CDN_MAP[apiBaseURL] || DEFAULT_CDN_URL;
+    },
+
+    initializeInputs() {
+      return {
+        linkToken: this.linkToken,
+        tenantConfig: this.tenantConfig,
+        shouldSendTokenOnSuccessfulLink: this.shouldSendTokenOnSuccessfulLink,
+        filePickerConfig: this.filePickerConfig,
+        parentContainerID: this.parentContainerID
+      };
+    },
+
+    // Parents often pass object props inline, which creates a new object every render; keying on the
+    // serialized values (functions drop out of JSON) re-initializes Link only when a value actually changes.
+    initializeInputsKey() {
+      return JSON.stringify(this.initializeInputs);
+    }
+
+  },
+
   created() {
-    this.loadScript("https://cdn.merge.dev/initialize.js").then(this.onScriptLoaded).catch(this.onScriptError);
+    this.loadScript(this.scriptSrc).then(this.onScriptLoaded).catch(this.onScriptError);
   },
 
   methods: {
@@ -46,20 +90,43 @@ var script = {
     },
 
     onScriptLoaded() {
-      window.MergeLink.initialize({
-        linkToken: this.linkToken,
-        tenantConfig: this.tenantConfig,
-        shouldSendTokenOnSuccessfulLink: this.shouldSendTokenOnSuccessfulLink,
-        onExit: this.onExit,
-        onReady: this.onReady,
-        onSuccess: this.onSuccess,
-        onValidationError: this.onValidationError,
-        filePickerConfig: this.filePickerConfig
+      this.isScriptLoaded = true;
+      this.initialize();
+    },
+
+    initialize() {
+      var _this = this;
+
+      if (!this.isScriptLoaded || !window.MergeLink || this.linkToken === undefined) {
+        return;
+      } // Callbacks read the current prop at call time, so swapping a handler doesn't re-initialize Link.
+
+
+      window.MergeLink.initialize({ ...this.initializeInputs,
+        filePickerConfig: this.filePickerConfig && { ...this.filePickerConfig,
+          onSubmit: function () {
+            return _this.filePickerConfig && _this.filePickerConfig.onSubmit(...arguments);
+          }
+        },
+        onExit: function () {
+          return _this.onExit && _this.onExit(...arguments);
+        },
+        onReady: function () {
+          return _this.onReady && _this.onReady(...arguments);
+        },
+        onSuccess: function () {
+          return _this.onSuccess && _this.onSuccess(...arguments);
+        },
+        onValidationError: function () {
+          return _this.onValidationError && _this.onValidationError(...arguments);
+        }
       });
     },
 
     handleOnClick() {
-      window.MergeLink.openLink();
+      if (window.MergeLink) {
+        window.MergeLink.openLink(this.initializeInputs);
+      }
     },
 
     loadScript(src) {
@@ -82,13 +149,10 @@ var script = {
 
   },
   watch: {
-    $data: {
-      handler() {
-        this.onScriptLoaded();
-      },
-
-      deep: true
+    initializeInputsKey() {
+      this.initialize();
     }
+
   }
 };
 
