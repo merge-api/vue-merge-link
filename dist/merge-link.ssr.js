@@ -1,4 +1,30 @@
-'use strict';var vue=require('vue');function _typeof(obj) {
+'use strict';var vue=require('vue');function ownKeys(object, enumerableOnly) {
+  var keys = Object.keys(object);
+
+  if (Object.getOwnPropertySymbols) {
+    var symbols = Object.getOwnPropertySymbols(object);
+    enumerableOnly && (symbols = symbols.filter(function (sym) {
+      return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+    })), keys.push.apply(keys, symbols);
+  }
+
+  return keys;
+}
+
+function _objectSpread2(target) {
+  for (var i = 1; i < arguments.length; i++) {
+    var source = null != arguments[i] ? arguments[i] : {};
+    i % 2 ? ownKeys(Object(source), !0).forEach(function (key) {
+      _defineProperty(target, key, source[key]);
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) {
+      Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+    });
+  }
+
+  return target;
+}
+
+function _typeof(obj) {
   "@babel/helpers - typeof";
 
   return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) {
@@ -6,7 +32,30 @@
   } : function (obj) {
     return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
   }, _typeof(obj);
-}var script = {
+}
+
+function _defineProperty(obj, key, value) {
+  if (key in obj) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+
+  return obj;
+}var DEFAULT_CDN_URL = "https://cdn.merge.dev/initialize.js"; // Subset of BASE_URL_TO_CDN_MAP in merge-api/react-merge-link src/useMergeLink.tsx.
+
+var BASE_URL_TO_CDN_MAP = {
+  "https://api.merge.dev": DEFAULT_CDN_URL,
+  "https://api-develop.merge.dev": "https://develop-cdn.merge.dev/initialize.js",
+  "https://api-mu-develop.merge.dev": "https://mu-develop-cdn.merge.dev/initialize.js",
+  "https://api-mu-staging.merge.dev": "https://mu-staging-cdn.merge.dev/initialize.js"
+};
+var script = {
   name: "MergeLink",
   props: {
     linkToken: String,
@@ -32,7 +81,7 @@
         // onSubmit is required
         var hasOnSubmit = "onSubmit" in filePickerConfigValue && typeof filePickerConfigValue.onSubmit === "function"; // types is optional
 
-        var hasTypes = "types" in value ? _typeof(filePickerConfigValue.types) === "object" : true; // arrays come back as objects
+        var hasTypes = "types" in filePickerConfigValue ? _typeof(filePickerConfigValue.types) === "object" : true; // arrays come back as objects
         // allowMultiSelect is optional
 
         var hasAllowMultiSelect = "allowMultiSelect" in filePickerConfigValue ? typeof filePickerConfigValue.allowMultiSelect === "boolean" : true;
@@ -41,27 +90,80 @@
     },
     parentContainerID: String
   },
+  data: function data() {
+    return {
+      isScriptLoaded: false
+    };
+  },
+  computed: {
+    scriptSrc: function scriptSrc() {
+      var apiBaseURL = this.tenantConfig && this.tenantConfig.apiBaseURL;
+      return apiBaseURL && BASE_URL_TO_CDN_MAP[apiBaseURL] || DEFAULT_CDN_URL;
+    },
+    initializeInputs: function initializeInputs() {
+      return {
+        linkToken: this.linkToken,
+        tenantConfig: this.tenantConfig,
+        shouldSendTokenOnSuccessfulLink: this.shouldSendTokenOnSuccessfulLink,
+        filePickerConfig: this.filePickerConfig,
+        parentContainerID: this.parentContainerID
+      };
+    },
+    // Parents often pass object props inline, which creates a new object every render; keying on the
+    // serialized values (functions drop out of JSON) re-initializes Link only when a value actually changes.
+    initializeInputsKey: function initializeInputsKey() {
+      return JSON.stringify(this.initializeInputs);
+    }
+  },
   created: function created() {
-    this.loadScript("https://cdn.merge.dev/initialize.js").then(this.onScriptLoaded).catch(this.onScriptError);
+    this.loadScript(this.scriptSrc).then(this.onScriptLoaded).catch(this.onScriptError);
   },
   methods: {
     onScriptError: function onScriptError() {
       console.error("There was an issue loading the link-initialize.js script");
     },
     onScriptLoaded: function onScriptLoaded() {
-      window.MergeLink.initialize({
-        linkToken: this.linkToken,
-        tenantConfig: this.tenantConfig,
-        shouldSendTokenOnSuccessfulLink: this.shouldSendTokenOnSuccessfulLink,
-        onExit: this.onExit,
-        onReady: this.onReady,
-        onSuccess: this.onSuccess,
-        onValidationError: this.onValidationError,
-        filePickerConfig: this.filePickerConfig
+      this.isScriptLoaded = true;
+      this.initialize();
+    },
+    initialize: function initialize() {
+      if (!this.isScriptLoaded || !window.MergeLink || this.linkToken === undefined) {
+        return;
+      }
+
+      window.MergeLink.initialize(this.buildLinkConfig());
+    },
+    // Callbacks read the current prop at call time, so swapping a handler doesn't re-initialize Link.
+    buildLinkConfig: function buildLinkConfig() {
+      var _this = this;
+
+      return _objectSpread2(_objectSpread2({}, this.initializeInputs), {}, {
+        filePickerConfig: this.filePickerConfig && _objectSpread2(_objectSpread2({}, this.filePickerConfig), {}, {
+          onSubmit: function onSubmit() {
+            var _this$filePickerConfi;
+
+            return _this.filePickerConfig && (_this$filePickerConfi = _this.filePickerConfig).onSubmit.apply(_this$filePickerConfi, arguments);
+          }
+        }),
+        onExit: function onExit() {
+          return _this.onExit && _this.onExit.apply(_this, arguments);
+        },
+        onReady: function onReady() {
+          return _this.onReady && _this.onReady.apply(_this, arguments);
+        },
+        onSuccess: function onSuccess() {
+          return _this.onSuccess && _this.onSuccess.apply(_this, arguments);
+        },
+        onValidationError: function onValidationError() {
+          return _this.onValidationError && _this.onValidationError.apply(_this, arguments);
+        }
       });
     },
     handleOnClick: function handleOnClick() {
-      window.MergeLink.openLink();
+      if (window.MergeLink) {
+        // initialize.js replaces its stored callbacks from this config when the token differs, so it needs them too.
+        window.MergeLink.openLink(this.buildLinkConfig());
+      }
     },
     loadScript: function loadScript(src) {
       return new Promise(function (resolve, reject) {
@@ -82,11 +184,8 @@
     }
   },
   watch: {
-    $data: {
-      handler: function handler() {
-        this.onScriptLoaded();
-      },
-      deep: true
+    initializeInputsKey: function initializeInputsKey() {
+      this.initialize();
     }
   }
 };var _hoisted_1 = {

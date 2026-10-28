@@ -9,6 +9,15 @@
 </template>
 
 <script>
+const DEFAULT_CDN_URL = "https://cdn.merge.dev/initialize.js";
+// Subset of BASE_URL_TO_CDN_MAP in merge-api/react-merge-link src/useMergeLink.tsx.
+const BASE_URL_TO_CDN_MAP = {
+  "https://api.merge.dev": DEFAULT_CDN_URL,
+  "https://api-develop.merge.dev": "https://develop-cdn.merge.dev/initialize.js",
+  "https://api-mu-develop.merge.dev": "https://mu-develop-cdn.merge.dev/initialize.js",
+  "https://api-mu-staging.merge.dev": "https://mu-staging-cdn.merge.dev/initialize.js",
+};
+
 export default {
   name: "MergeLink",
   props: {
@@ -34,7 +43,7 @@ export default {
           typeof filePickerConfigValue.onSubmit === "function";
         // types is optional
         const hasTypes =
-          "types" in value
+          "types" in filePickerConfigValue
             ? typeof filePickerConfigValue.types === "object"
             : true; // arrays come back as objects
         // allowMultiSelect is optional
@@ -47,8 +56,31 @@ export default {
     },
     parentContainerID: String,
   },
+  data() {
+    return { isScriptLoaded: false };
+  },
+  computed: {
+    scriptSrc() {
+      const apiBaseURL = this.tenantConfig && this.tenantConfig.apiBaseURL;
+      return (apiBaseURL && BASE_URL_TO_CDN_MAP[apiBaseURL]) || DEFAULT_CDN_URL;
+    },
+    initializeInputs() {
+      return {
+        linkToken: this.linkToken,
+        tenantConfig: this.tenantConfig,
+        shouldSendTokenOnSuccessfulLink: this.shouldSendTokenOnSuccessfulLink,
+        filePickerConfig: this.filePickerConfig,
+        parentContainerID: this.parentContainerID,
+      };
+    },
+    // Parents often pass object props inline, which creates a new object every render; keying on the
+    // serialized values (functions drop out of JSON) re-initializes Link only when a value actually changes.
+    initializeInputsKey() {
+      return JSON.stringify(this.initializeInputs);
+    },
+  },
   created() {
-    this.loadScript("https://cdn.merge.dev/initialize.js")
+    this.loadScript(this.scriptSrc)
       .then(this.onScriptLoaded)
       .catch(this.onScriptError);
   },
@@ -57,19 +89,34 @@ export default {
       console.error("There was an issue loading the link-initialize.js script");
     },
     onScriptLoaded() {
-      window.MergeLink.initialize({
-        linkToken: this.linkToken,
-        tenantConfig: this.tenantConfig,
-        shouldSendTokenOnSuccessfulLink: this.shouldSendTokenOnSuccessfulLink,
-        onExit: this.onExit,
-        onReady: this.onReady,
-        onSuccess: this.onSuccess,
-        onValidationError: this.onValidationError,
-        filePickerConfig: this.filePickerConfig,
-      });
+      this.isScriptLoaded = true;
+      this.initialize();
+    },
+    initialize() {
+      if (!this.isScriptLoaded || !window.MergeLink || this.linkToken === undefined) {
+        return;
+      }
+      window.MergeLink.initialize(this.buildLinkConfig());
+    },
+    // Callbacks read the current prop at call time, so swapping a handler doesn't re-initialize Link.
+    buildLinkConfig() {
+      return {
+        ...this.initializeInputs,
+        filePickerConfig: this.filePickerConfig && {
+          ...this.filePickerConfig,
+          onSubmit: (...args) => this.filePickerConfig && this.filePickerConfig.onSubmit(...args),
+        },
+        onExit: (...args) => this.onExit && this.onExit(...args),
+        onReady: (...args) => this.onReady && this.onReady(...args),
+        onSuccess: (...args) => this.onSuccess && this.onSuccess(...args),
+        onValidationError: (...args) => this.onValidationError && this.onValidationError(...args),
+      };
     },
     handleOnClick() {
-      window.MergeLink.openLink();
+      if (window.MergeLink) {
+        // initialize.js replaces its stored callbacks from this config when the token differs, so it needs them too.
+        window.MergeLink.openLink(this.buildLinkConfig());
+      }
     },
     loadScript(src) {
       return new Promise(function (resolve, reject) {
@@ -89,11 +136,8 @@ export default {
     },
   },
   watch: {
-    $data: {
-      handler() {
-        this.onScriptLoaded();
-      },
-      deep: true,
+    initializeInputsKey() {
+      this.initialize();
     },
   },
 };
