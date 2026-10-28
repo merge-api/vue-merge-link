@@ -10,18 +10,12 @@
 
 <script>
 const DEFAULT_CDN_URL = "https://cdn.merge.dev/initialize.js";
-// Keep in sync with BASE_URL_TO_CDN_MAP in merge-api/react-merge-link src/useMergeLink.tsx.
+// Subset of BASE_URL_TO_CDN_MAP in merge-api/react-merge-link src/useMergeLink.tsx.
 const BASE_URL_TO_CDN_MAP = {
   "https://api.merge.dev": DEFAULT_CDN_URL,
-  "https://api-oai-usw2.openaimerge.com": "https://cdn.openaimerge.com/initialize.js",
-  "https://api-oai-euw1.openaimerge.com": "https://cdn.openaimerge.com/initialize.js",
-  "https://api-oai-apne3.openaimerge.com": "https://cdn.openaimerge.com/initialize.js",
-  "https://api-oai-apne2.openaimerge.com": "https://cdn.openaimerge.com/initialize.js",
-  "https://api-oai-apse2.openaimerge.com": "https://cdn.openaimerge.com/initialize.js",
   "https://api-develop.merge.dev": "https://develop-cdn.merge.dev/initialize.js",
   "https://api-mu-develop.merge.dev": "https://mu-develop-cdn.merge.dev/initialize.js",
   "https://api-mu-staging.merge.dev": "https://mu-staging-cdn.merge.dev/initialize.js",
-  "https://api-usw2.dropboxmerge.com": "https://cdn.dropboxmerge.com/initialize.js",
 };
 
 export default {
@@ -102,8 +96,11 @@ export default {
       if (!this.isScriptLoaded || !window.MergeLink || this.linkToken === undefined) {
         return;
       }
-      // Callbacks read the current prop at call time, so swapping a handler doesn't re-initialize Link.
-      window.MergeLink.initialize({
+      window.MergeLink.initialize(this.buildLinkConfig());
+    },
+    // Callbacks read the current prop at call time, so swapping a handler doesn't re-initialize Link.
+    buildLinkConfig() {
+      return {
         ...this.initializeInputs,
         filePickerConfig: this.filePickerConfig && {
           ...this.filePickerConfig,
@@ -113,11 +110,12 @@ export default {
         onReady: (...args) => this.onReady && this.onReady(...args),
         onSuccess: (...args) => this.onSuccess && this.onSuccess(...args),
         onValidationError: (...args) => this.onValidationError && this.onValidationError(...args),
-      });
+      };
     },
     handleOnClick() {
       if (window.MergeLink) {
-        window.MergeLink.openLink(this.initializeInputs);
+        // initialize.js replaces its stored callbacks from this config when the token differs, so it needs them too.
+        window.MergeLink.openLink(this.buildLinkConfig());
       }
     },
     loadScript(src) {
