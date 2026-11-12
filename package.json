@@ -2,6 +2,7 @@
   "name": "@mergeapi/vue-merge-link",
   "version": "3.1.2",
   "description": "",
+  "license": "MIT",
   "main": "dist/merge-link.ssr.js",
   "browser": "dist/merge-link.esm.js",
   "module": "dist/merge-link.esm.js",
