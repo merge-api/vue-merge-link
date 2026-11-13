@@ -1,14 +1,16 @@
 {
   "name": "@mergeapi/vue-merge-link",
-  "version": "3.1.2",
+  "version": "3.2.0",
   "description": "",
   "main": "dist/merge-link.ssr.js",
   "browser": "dist/merge-link.esm.js",
   "module": "dist/merge-link.esm.js",
   "unpkg": "dist/merge-link.min.js",
+  "types": "types/index.d.ts",
   "files": [
     "dist/*",
-    "src/**/*.vue"
+    "src/**/*.vue",
+    "types/*"
   ],
   "sideEffects": false,
   "scripts": {
