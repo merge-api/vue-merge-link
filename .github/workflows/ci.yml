@@ -32,7 +32,7 @@ jobs:
       - name: Publish to npm
         run: |
           publish() {
-            npx -y npm@latest publish "$@"
+            npx -y npm@latest stage publish "$@"
           }
           if [[ ${GITHUB_REF} == *alpha* ]]; then
             publish --access public --tag alpha
